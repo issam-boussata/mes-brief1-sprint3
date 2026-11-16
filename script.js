@@ -13,7 +13,22 @@ let allCountries = [];
  * @returns {Promise<Array>} Le tableau de tous les pays.
  */
 async function fetchCountries() {
-  // TODO
+  try{
+    const res = await fetch(API_URL) ;
+    if (res.ok) {
+      const data = await res.json() ;
+      allCountries = data ;
+      displayCountries(allCountries)
+      
+    }else{
+      throw new Error("http error : " + res.status)
+    }
+
+  }catch(err){
+    console.Error(err.message);
+    
+
+  }
 }
 
 /**
@@ -36,7 +51,50 @@ function createCountryCard(country) {
  * @param {Array} countries - Les pays à afficher.
  */
 function displayCountries(countries) {
-  // TODO
+  const containner_cartes = document.getElementById("cartes") ;
+  containner_cartes.innerHTML = "" ;
+
+  countries.forEach(countrie => {
+    // creation des elements
+    const countainner_carte = document.createElement("article") ;
+    const drapeau_countr = document.createElement("img") ;
+    const name_country = document.createElement("h2") ;
+    const div_capital = document.createElement("div") ;
+    const capital_key = document.createElement("p") ;
+    const capital_value = document.createElement("p") ;
+    const div_population = document.createElement("div") ;
+    const population_key = document.createElement("p") ;
+    const population_value = document.createElement("p") ;
+
+
+    //remplir
+    drapeau_countr.src = countrie.flags.png || `images/Drapeau_img.webp` ;
+    name_country.textContent = countrie.name ;
+    capital_key.textContent = "Capitale" ;
+    capital_value.textContent = countrie.capital ;
+    population_key.textContent = "Population" ;
+    population_value.textContent = countrie.area ;
+
+    //append
+    div_capital.append(capital_key , capital_value) ;
+    div_population.append(population_key ,population_value) ;
+    countainner_carte.append(drapeau_countr , name_country , div_capital , div_population) ;
+    containner_cartes.append(countainner_carte) ;
+
+
+    // style in tailwindcss
+    countainner_carte.className = "bg-[#ffffff] border border-[#d9e0e8] rounded-md " ;
+    drapeau_countr.className = " w-[100%]" ;
+    name_country.className = " m-4 font-bold text-[30px] "
+    div_capital.className = "m-4 flex justify-between" ;
+    div_population.className = "m-4 flex justify-between" ;
+    capital_key.className = "text-[#5B6576] " ;
+    capital_value.className = "text-[20px] " ;
+    population_key.className = "text-[#5B6576] " ;
+    population_value.className = "text-[20px] " ;
+
+  })
+
 }
 
 /**
@@ -48,9 +106,21 @@ function displayCountries(countries) {
  * Aucune requête vers l'API ici !
  */
 function filterCountries() {
-  // TODO
+  const Continent = document.getElementById("Continent").value ;
+  const pay = document.getElementById("pay").value ;
+  const Countries = allCountries.filter(Countrie => (Countrie.region === Continent || Continent === "" ) && (Countrie.name.toLowerCase().includes(pay.toLowerCase()) || pay === "") ) ;
+  displayCountries(Countries)
 }
+document.getElementById("Continent").addEventListener("change" ,()=>{
 
+  filterCountries()
+} 
+) ;
+document.getElementById("pay").addEventListener("input" ,()=>{
+
+  filterCountries()
+} 
+) ;
 
 // ------------------------------------------------------------
 // BONUS
@@ -99,7 +169,7 @@ function showError(message) {
  * (Bonus) Gère le chargement et les erreurs avec try...catch.
  */
 async function init() {
-  // TODO
+  fetchCountries() ;
 }
 
 init();
